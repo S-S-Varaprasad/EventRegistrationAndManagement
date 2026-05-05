@@ -93,6 +93,4 @@ The project follows **MVC** with DAO and Service layers:
 Browser (JSP) → Servlets (Controller) → Service → DAO → MySQL
 ```
 
-## License
 
-This project is developed for educational purposes.
