@@ -1,0 +1,252 @@
+<!-- Event Registration & Management System -->
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- Home Routing -->
+	<servlet>
+		<servlet-name>HomeServlet</servlet-name>
+		<servlet-class>com.event.controller.HomeServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>HomeServlet</servlet-name>
+		<url-pattern>/home</url-pattern>
+	</servlet-mapping>
+
+	<!-- Manage Organizer Events -->
+	<servlet>
+		<servlet-name>ManageEventsServlet</servlet-name>
+		<servlet-class>com.event.controller.ManageEventsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ManageEventsServlet</servlet-name>
+		<url-pattern>/manage-events</url-pattern>
+	</servlet-mapping>
+
+	<!-- Cancel Registration -->
+	<servlet>
+		<servlet-name>CancelRegistrationServlet</servlet-name>
+		<servlet-class>com.event.controller.CancelRegistrationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CancelRegistrationServlet</servlet-name>
+		<url-pattern>/cancel-registration</url-pattern>
+	</servlet-mapping>
+
+	<!-- Toggle Event Status -->
+	<servlet>
+		<servlet-name>ToggleEventStatusServlet</servlet-name>
+		<servlet-class>com.event.controller.ToggleEventStatusServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ToggleEventStatusServlet</servlet-name>
+		<url-pattern>/toggle-event-status</url-pattern>
+	</servlet-mapping>
+
+	<!-- Login -->
+	<servlet>
+		<servlet-name>LoginServlet</servlet-name>
+		<servlet-class>com.event.controller.LoginServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LoginServlet</servlet-name>
+		<url-pattern>/login</url-pattern>
+	</servlet-mapping>
+
+	<!-- Logout -->
+	<servlet>
+		<servlet-name>LogoutServlet</servlet-name>
+		<servlet-class>com.event.controller.LogoutServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LogoutServlet</servlet-name>
+		<url-pattern>/logout</url-pattern>
+	</servlet-mapping>
+
+	<!-- Register User -->
+	<servlet>
+		<servlet-name>RegisterUserServlet</servlet-name>
+		<servlet-class>com.event.controller.RegisterUserServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RegisterUserServlet</servlet-name>
+		<url-pattern>/register-user</url-pattern>
+	</servlet-mapping>
+
+	<!-- Add Event -->
+	<servlet>
+		<servlet-name>AddEventServlet</servlet-name>
+		<servlet-class>com.event.controller.AddEventServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AddEventServlet</servlet-name>
+		<url-pattern>/add-event</url-pattern>
+	</servlet-mapping>
+
+	<!-- View Events -->
+	<servlet>
+		<servlet-name>ViewEventsServlet</servlet-name>
+		<servlet-class>com.event.controller.ViewEventsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ViewEventsServlet</servlet-name>
+		<url-pattern>/view-events</url-pattern>
+	</servlet-mapping>
+
+	<!-- Register for Event -->
+	<servlet>
+		<servlet-name>RegisterEventServlet</servlet-name>
+		<servlet-class>com.event.controller.RegisterEventServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RegisterEventServlet</servlet-name>
+		<url-pattern>/register-event</url-pattern>
+	</servlet-mapping>
+
+	<!-- My Events -->
+	<servlet>
+		<servlet-name>MyEventsServlet</servlet-name>
+		<servlet-class>com.event.controller.MyEventsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>MyEventsServlet</servlet-name>
+		<url-pattern>/my-events</url-pattern>
+	</servlet-mapping>
+
+	<!-- Register Organization -->
+	<servlet>
+		<servlet-name>RegisterOrganizationServlet</servlet-name>
+		<servlet-class>com.event.controller.RegisterOrganizationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RegisterOrganizationServlet</servlet-name>
+		<url-pattern>/register-organization</url-pattern>
+	</servlet-mapping>
+
+	<!-- Create Org Entry (redirect helper) -->
+	<servlet>
+		<servlet-name>CreateOrgEntryServlet</servlet-name>
+		<servlet-class>com.event.controller.CreateOrgEntryServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CreateOrgEntryServlet</servlet-name>
+		<url-pattern>/create-org-entry</url-pattern>
+	</servlet-mapping>
+
+	<!-- Report Event -->
+	<servlet>
+		<servlet-name>ReportEventServlet</servlet-name>
+		<servlet-class>com.event.controller.ReportEventServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ReportEventServlet</servlet-name>
+		<url-pattern>/report-event</url-pattern>
+	</servlet-mapping>
+
+	<!-- Verify Payments -->
+	<servlet>
+		<servlet-name>VerifyPaymentsServlet</servlet-name>
+		<servlet-class>com.event.controller.VerifyPaymentsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>VerifyPaymentsServlet</servlet-name>
+		<url-pattern>/verify-payments</url-pattern>
+	</servlet-mapping>
+
+	<!-- My Tickets -->
+	<servlet>
+		<servlet-name>MyTicketsServlet</servlet-name>
+		<servlet-class>com.event.controller.MyTicketsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>MyTicketsServlet</servlet-name>
+		<url-pattern>/my-tickets</url-pattern>
+	</servlet-mapping>
+
+	<!-- Event CheckIn -->
+	<servlet>
+		<servlet-name>EventCheckInServlet</servlet-name>
+		<servlet-class>com.event.controller.EventCheckInServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>EventCheckInServlet</servlet-name>
+		<url-pattern>/event-checkin</url-pattern>
+	</servlet-mapping>
+
+	<!-- Notifications Center -->
+	<servlet>
+		<servlet-name>NotificationsServlet</servlet-name>
+		<servlet-class>com.event.controller.NotificationsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>NotificationsServlet</servlet-name>
+		<url-pattern>/notifications</url-pattern>
+	</servlet-mapping>
+
+	<!-- Notification Count AJAX -->
+	<servlet>
+		<servlet-name>NotificationCountServlet</servlet-name>
+		<servlet-class>com.event.controller.NotificationCountServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>NotificationCountServlet</servlet-name>
+		<url-pattern>/notification-count</url-pattern>
+	</servlet-mapping>
+
+	<!-- Event Detail Page -->
+	<servlet>
+		<servlet-name>EventDetailServlet</servlet-name>
+		<servlet-class>com.event.controller.EventDetailServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>EventDetailServlet</servlet-name>
+		<url-pattern>/event</url-pattern>
+	</servlet-mapping>
+
+	<!-- Waitlist Viewer -->
+	<servlet>
+		<servlet-name>WaitlistViewServlet</servlet-name>
+		<servlet-class>com.event.controller.WaitlistViewServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WaitlistViewServlet</servlet-name>
+		<url-pattern>/view-waitlist</url-pattern>
+	</servlet-mapping>
+
+	<!-- View Cancellations -->
+	<servlet>
+		<servlet-name>ViewCancellationsServlet</servlet-name>
+		<servlet-class>com.event.controller.ViewCancellationsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ViewCancellationsServlet</servlet-name>
+		<url-pattern>/view-cancellations</url-pattern>
+	</servlet-mapping>
+
+	<!-- Manage Refunds (Global) -->
+	<servlet>
+		<servlet-name>ManageRefundsServlet</servlet-name>
+		<servlet-class>com.event.controller.ManageRefundsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ManageRefundsServlet</servlet-name>
+		<url-pattern>/manage-refunds</url-pattern>
+	</servlet-mapping>
+
+	<!-- Event Attendees -->
+	<servlet>
+		<servlet-name>EventAttendeesServlet</servlet-name>
+		<servlet-class>com.event.controller.EventAttendeesServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>EventAttendeesServlet</servlet-name>
+		<url-pattern>/event-attendees</url-pattern>
+	</servlet-mapping>
+
+</web-app>

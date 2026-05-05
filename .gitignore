@@ -1,0 +1,18 @@
+# Eclipse IDE
+target/
+*.class
+
+# Maven
+*.jar
+*.war
+*.ear
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docs folder (excluded from GitHub)
+docs/
+
+# Upload folder (runtime data)
+src/main/webapp/uploads/
