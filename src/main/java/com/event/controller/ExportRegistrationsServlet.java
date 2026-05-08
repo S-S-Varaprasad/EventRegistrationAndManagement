@@ -62,8 +62,46 @@ public class ExportRegistrationsServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter();
              Connection con = DBConnection.getConnection()) {
 
+            List<String> customKeys = new ArrayList<>();
+            List<String> customLabels = new ArrayList<>();
+            String schema = currentEvent.getCustomFormSchema();
+            if (schema != null && schema.length() > 2) {
+                String cleanSchema = schema.substring(1, schema.length() - 1);
+                String[] objects = cleanSchema.split("\\},\\{");
+                for (String obj : objects) {
+                    String cleanObj = obj.replace("{", "").replace("}", "");
+                    String[] pairs = cleanObj.split(",");
+                    String keyName = null, keyLabel = null;
+                    for (String pair : pairs) {
+                        String[] kv = pair.split(":");
+                        if (kv.length >= 2) {
+                            String k = kv[0].replace("\"", "").trim();
+                            String v = kv[1].replace("\"", "").trim();
+                            if ("name".equals(k)) keyName = v;
+                            if ("label".equals(k)) keyLabel = v;
+                        }
+                    }
+                    if (keyName != null) {
+                        customKeys.add(keyName);
+                        customLabels.add(keyLabel != null ? keyLabel : keyName);
+                    }
+                }
+            }
+
+            boolean isTeamEvent = "TEAM".equals(currentEvent.getEventType());
+            boolean isPaidEvent = "PAID".equals(currentEvent.getParticipationMode());
+
             // Header
-            out.println("Registration ID,User Name,User Email,Team Name,Custom Data,Payment Screenshot Path");
+            StringBuilder header = new StringBuilder("Registration ID");
+            if (isTeamEvent) header.append(",Role");
+            header.append(",User Name,User Email");
+            if (isTeamEvent) header.append(",Team Name");
+            if (isPaidEvent) header.append(",Payment Screenshot Path");
+            
+            for (String label : customLabels) {
+                header.append(",\"").append(label).append("\"");
+            }
+            out.println(header.toString());
 
             String sql = "SELECT r.id, u.name as user_name, u.email as user_email, t.name as team_name, r.custom_answers, r.payment_screenshot_path, t.id as team_id " +
                          "FROM registrations r " +
@@ -79,38 +117,57 @@ public class ExportRegistrationsServlet extends HttpServlet {
                 int regId = rs.getInt("id");
                 String uName = rs.getString("user_name");
                 String uEmail = rs.getString("user_email");
-                String tName = rs.getString("team_name") != null ? rs.getString("team_name") : "Individual";
-                String custom = rs.getString("custom_answers") != null ? rs.getString("custom_answers").replace("\"", "'") : "None";
+                boolean isTeam = rs.getString("team_name") != null;
+                String tName = isTeam ? rs.getString("team_name") : "N/A";
+                String customAnswers = rs.getString("custom_answers");
                 String pay = rs.getString("payment_screenshot_path") != null ? rs.getString("payment_screenshot_path") : "N/A";
+                String role = isTeam ? "Leader" : "Individual";
 
-                // Output Leader/Individual
-                out.printf("\"%d\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", regId, uName, uEmail, tName, custom, pay);
+                StringBuilder row = new StringBuilder();
+                row.append("\"").append(regId).append("\"");
+                if (isTeamEvent) row.append(",\"").append(role).append("\"");
+                row.append(",\"").append(uName).append("\",\"").append(uEmail).append("\"");
+                if (isTeamEvent) row.append(",\"").append(tName).append("\"");
+                if (isPaidEvent) row.append(",\"").append(pay).append("\"");
+
+                for (String key : customKeys) {
+                    row.append(",\"").append(extractJsonValue(customAnswers, key)).append("\"");
+                }
+                out.println(row.toString());
 
                 // Fetch and Output Roster Members if it's a team
-                if (rs.getString("team_name") != null) {
+                if (isTeamEvent && isTeam) {
                     int teamId = rs.getInt("team_id");
                     String rosterJson = new com.event.dao.TeamDAO().getRosterByTeamId(teamId);
-                    if (rosterJson != null && rosterJson.startsWith("[")) {
+                    if (rosterJson != null && rosterJson.length() > 2) {
                         try {
-                             // NATIVE PARSE: Since the JSON is a simple array of objects, we parse it manually
-                             // to avoid dependency on missing GSON jar.
-                             String data = rosterJson.substring(1, rosterJson.length() - 1); // Remove [ ]
+                             String data = rosterJson.substring(1, rosterJson.length() - 1);
                              String[] objects = data.split("\\},\\{");
                              for (String obj : objects) {
-                                 String cleanObj = obj.replace("{", "").replace("}", "");
-                                 String[] pairs = cleanObj.split(",");
-                                 StringBuilder sb = new StringBuilder();
-                                 String mName = "N/A";
-                                 for (String pair : pairs) {
-                                     String[] kv = pair.split(":");
-                                     if (kv.length == 2) {
-                                         String key = kv[0].replace("\"", "").trim();
-                                         String val = kv[1].replace("\"", "").trim();
-                                         sb.append(key).append(":").append(val).append("; ");
-                                         if (key.equalsIgnoreCase("name")) mName = val;
+                                 String cleanObj = "{" + obj.replace("{", "").replace("}", "") + "}";
+                                 
+                                 String mName = "Team Member";
+                                 for (String key : customKeys) {
+                                     if (key.toLowerCase().contains("name")) {
+                                         String val = extractJsonValue(cleanObj, key);
+                                         if (!val.equals("N/A")) {
+                                             mName = val;
+                                             break;
+                                         }
                                      }
                                  }
-                                 out.printf("\"%d\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", regId, "Member: " + mName, "via Leader", tName, sb.toString(), "N/A");
+
+                                 StringBuilder mRow = new StringBuilder();
+                                 mRow.append("\"").append(regId).append("\"");
+                                 mRow.append(",\"Member\"");
+                                 mRow.append(",\"").append(mName).append("\",\"via Leader\"");
+                                 mRow.append(",\"").append(tName).append("\"");
+                                 if (isPaidEvent) mRow.append(",\"N/A\"");
+
+                                 for (String key : customKeys) {
+                                     mRow.append(",\"").append(extractJsonValue(cleanObj, key)).append("\"");
+                                 }
+                                 out.println(mRow.toString());
                              }
                         } catch(Exception ex) {}
                     }
@@ -119,5 +176,31 @@ public class ExportRegistrationsServlet extends HttpServlet {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private String extractJsonValue(String jsonObject, String key) {
+        if (jsonObject == null || jsonObject.isEmpty() || jsonObject.equals("[]")) return "N/A";
+        String search1 = "\"" + key + "\":\"";
+        int idx = jsonObject.indexOf(search1);
+        if (idx != -1) {
+            int start = idx + search1.length();
+            int end = jsonObject.indexOf("\"", start);
+            if (end != -1) return jsonObject.substring(start, end).replace("\"", "'");
+        }
+        String search2 = "\"" + key + "\":";
+        idx = jsonObject.indexOf(search2);
+        if (idx != -1) {
+            int start = idx + search2.length();
+            int end = jsonObject.indexOf(",", start);
+            if (end == -1) end = jsonObject.indexOf("}", start);
+            if (end != -1) {
+                String val = jsonObject.substring(start, end).trim();
+                if (val.startsWith("\"") && val.endsWith("\"")) {
+                    val = val.substring(1, val.length() - 1);
+                }
+                return val.replace("\"", "'");
+            }
+        }
+        return "N/A";
     }
 }

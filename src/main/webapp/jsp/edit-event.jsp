@@ -153,45 +153,29 @@
                             </div>
                           </div>
 
-                          <div class="dynamic-section" id="leaderFieldsSection" style="<%= "TEAM".equals(e.getEventType()) ? "" : "display:none;" %>">
-                            <h3>Attendee Custom Fields (Leader)</h3>
-                            <p class="hint">Fields for the primary registrant.</p>
+                          <div class="dynamic-section" id="leaderFieldsSection" style="display:block;">
+                            <h3>Attendee Custom Fields</h3>
+                            <p class="hint">Fields required for the attendees.</p>
                             <div id="field-builder-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom: 12px;"></div>
-                            <div style="display:flex; gap:8px;">
-                              <input type="text" id="newFieldLabel" placeholder="Field name" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                              <select id="newFieldType" style="padding:8px; border:1px solid #ddd; border-radius:4px;">
+                            <div style="display:flex; gap:8px; align-items: center;">
+                              <input type="text" id="newFieldLabel" placeholder="Field name" style="flex:1; min-width: 100px; padding:8px; border:1px solid #ddd; border-radius:4px; margin: 0;">
+                              <select id="newFieldType" style="padding:8px; border:1px solid #ddd; border-radius:4px; width: auto; flex-shrink: 0; margin: 0;">
                                 <option value="text">Text</option>
                                 <option value="number">Number</option>
                               </select>
-                              <button type="button" class="btn btn-soft" onclick="handleField('leader', 'add')">+ Add</button>
+                              <button type="button" class="btn btn-soft" style="width: auto; flex-shrink: 0; padding: 8px 16px;" onclick="handleField('add')">+ Add</button>
                             </div>
                             <input type="hidden" name="custom_form_schema" id="custom_form_schema" value='<%= (e.getCustomFormSchema() == null || e.getCustomFormSchema().isEmpty()) ? "[]" : e.getCustomFormSchema() %>'>
-                          </div>
-
-                          <div class="dynamic-section" id="memberDetailsSection" style="<%= "TEAM".equals(e.getEventType()) ? "" : "display:none;" %>">
-                            <h3>Team Member Details</h3>
-                            <p class="hint">Fields required for each team member.</p>
-                            <div id="member-builder-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom: 12px;"></div>
-                            <div style="display:flex; gap:8px;">
-                              <input type="text" id="newMemberLabel" placeholder="Member field" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                              <select id="newMemberType" style="padding:8px; border:1px solid #ddd; border-radius:4px;">
-                                <option value="text">Text</option>
-                                <option value="number">Number</option>
-                              </select>
-                              <button type="button" class="btn btn-soft" onclick="handleField('member', 'add')">+ Add</button>
-                            </div>
                             <input type="hidden" name="member_form_schema" id="member_form_schema" value='<%= (e.getMemberFormSchema() == null || e.getMemberFormSchema().isEmpty()) ? "[]" : e.getMemberFormSchema() %>'>
                           </div>
 
                           <script>
-                            let leaderFields = [];
-                            let memberFields = [];
+                            let customFields = [];
                             
                             function toggleFields() {
                                 const type = document.getElementById('eventType').value;
                                 const isTeam = (type === 'TEAM');
-                                document.getElementById('leaderFieldsSection').style.display = isTeam ? 'block' : 'none';
-                                document.getElementById('memberDetailsSection').style.display = isTeam ? 'block' : 'none';
+                                document.getElementById('leaderFieldsSection').style.display = 'block';
                                 // Note: teamGroup handling if present
                                 let tg = document.getElementById('teamGroup');
                                 if(tg) tg.style.display = isTeam ? 'block' : 'none';
@@ -199,19 +183,16 @@
                             
                             function init() {
                                 try {
-                                    leaderFields = JSON.parse(document.getElementById('custom_form_schema').value || "[]");
-                                    memberFields = JSON.parse(document.getElementById('member_form_schema').value || "[]");
-                                    render('leader', leaderFields, 'field-builder-container', 'custom_form_schema');
-                                    render('member', memberFields, 'member-builder-container', 'member_form_schema');
+                                    customFields = JSON.parse(document.getElementById('custom_form_schema').value || "[]");
+                                    render(customFields, 'field-builder-container');
                                 } catch(e) { console.error(e); }
                             }
 
-                            function handleField(target, action, index) {
-                                const list = (target === 'leader') ? leaderFields : memberFields;
-                                const containerId = (target === 'leader') ? 'field-builder-container' : 'member-builder-container';
-                                const inputId = (target === 'leader') ? 'newFieldLabel' : 'newMemberLabel';
-                                const typeId = (target === 'leader') ? 'newFieldType' : 'newMemberType';
-                                const hiddenId = (target === 'leader') ? 'custom_form_schema' : 'member_form_schema';
+                            function handleField(action, index) {
+                                const list = customFields;
+                                const containerId = 'field-builder-container';
+                                const inputId = 'newFieldLabel';
+                                const typeId = 'newFieldType';
 
                                 if (action === 'add') {
                                     const label = document.getElementById(inputId).value.trim();
@@ -222,20 +203,21 @@
                                 } else if (action === 'remove') {
                                     list.splice(index, 1);
                                 }
-                                render(target, list, containerId, hiddenId);
+                                render(list, containerId);
                             }
 
-                            function render(target, list, containerId, hiddenId) {
+                            function render(list, containerId) {
                                 const container = document.getElementById(containerId);
                                 container.innerHTML = '';
                                 list.forEach((f, i) => {
                                     const div = document.createElement('div');
                                     div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px; border:1px solid #eee; border-radius:6px;";
                                     div.innerHTML = `<div><strong>${f.label}</strong> <span style="font-size:10px; opacity:0.6;">(${f.type.toUpperCase()})</span></div>
-                                                     <button type="button" onclick="handleField('${target}', 'remove', ${i})" style="color:var(--danger); font-size:18px;">&times;</button>`;
+                                                     <button type="button" onclick="handleField('remove', ${i})" style="color:var(--danger); font-size:18px;">&times;</button>`;
                                     container.appendChild(div);
                                 });
-                                document.getElementById(hiddenId).value = JSON.stringify(list);
+                                document.getElementById('custom_form_schema').value = JSON.stringify(list);
+                                document.getElementById('member_form_schema').value = JSON.stringify(list);
                             }
 
                             window.onload = init;

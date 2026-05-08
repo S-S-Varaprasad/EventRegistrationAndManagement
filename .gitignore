@@ -2,8 +2,7 @@
 target/
 *.class
 
-# Maven
-*.jar
+# Maven build artifacts
 *.war
 *.ear
 
@@ -11,7 +10,7 @@ target/
 .DS_Store
 Thumbs.db
 
-# Docs folder (excluded from GitHub)
+# Docs folder (report & reference docs - excluded from GitHub)
 docs/
 
 # Upload folder (runtime data)
